@@ -1,26 +1,29 @@
 package main
 
-// import (
-// 	"testing"
+import (
+	"testing"
 
-// 	"github.com/aws/aws-cdk-go/awscdk/v2"
-// 	"github.com/aws/aws-cdk-go/awscdk/v2/assertions"
-// 	"github.com/aws/jsii-runtime-go"
-// )
+	"github.com/aws/aws-cdk-go/awscdk/v2"
+	"github.com/aws/aws-cdk-go/awscdk/v2/assertions"
+	"github.com/aws/jsii-runtime-go"
+	"github.com/bradleyjkemp/cupaloy/v2"
+)
 
-// example tests. To run these tests, uncomment this file along with the
-// example resource in hello_go_cdk_test.go
-// func TestHelloGoCdkStack(t *testing.T) {
-// 	// GIVEN
-// 	app := awscdk.NewApp(nil)
+// Resource properties check test
+func TestHelloGoCdkStack(t *testing.T) {
+	app := awscdk.NewApp(nil)
+	stack := NewHelloGoCdkStack(app, "MyStack", nil)
+	template := assertions.Template_FromStack(stack, nil)
+	// template should have a resource of type AWS::SSM::Parameter
+	template.HasResourceProperties(jsii.String("AWS::SSM::Parameter"), map[string]interface{}{
+		"Name": "HelloFromGoCDK",
+	})
+}
 
-// 	// WHEN
-// 	stack := NewHelloGoCdkStack(app, "MyStack", nil)
-
-// 	// THEN
-// 	template := assertions.Template_FromStack(stack)
-
-// 	template.HasResourceProperties(jsii.String("AWS::SQS::Queue"), map[string]interface{}{
-// 		"VisibilityTimeout": 300,
-// 	})
-// }
+// Snap Shot test
+func TestHelloGoCdkStackSnapshot(t *testing.T) {
+	app := awscdk.NewApp(nil)
+	stack := NewHelloGoCdkStack(app, "MyStack", nil)
+	template := assertions.Template_FromStack(stack, nil)
+	cupaloy.SnapshotT(t, template.ToJSON())
+}
